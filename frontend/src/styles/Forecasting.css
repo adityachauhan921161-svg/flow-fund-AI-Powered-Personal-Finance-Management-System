@@ -1,0 +1,178 @@
+
+.forecasting-page {
+  padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  color: #f9fafb;
+}
+
+.forecasting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.forecasting-header h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.forecasting-header p,
+.forecast-muted {
+  color: #9ca3af;
+  line-height: 1.6;
+}
+
+.forecast-refresh-button {
+  padding: 12px 18px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.forecast-refresh-button:hover {
+  background: #1d4ed8;
+}
+
+.forecasting-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.forecast-summary-card,
+.forecast-section {
+  background: #1f2937;
+  border-radius: 12px;
+  padding: 24px;
+  min-width: 0;
+}
+
+.forecast-summary-card h3 {
+  font-size: 14px;
+  color: #9ca3af;
+  margin-bottom: 12px;
+}
+
+.forecast-summary-card h2 {
+  font-size: 23px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.forecast-income {
+  color: #10b981;
+}
+
+.forecast-expense {
+  color: #ef4444;
+}
+
+.forecast-section {
+  margin-top: 24px;
+}
+
+.forecast-section h2 {
+  font-size: 22px;
+  margin: 0 0 14px;
+}
+
+.forecast-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px;
+  margin-top: 24px;
+}
+
+.forecast-controls > div {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.forecast-controls label {
+  font-weight: 600;
+}
+
+.forecast-controls input[type="range"] {
+  width: 100%;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.forecast-chart-container {
+  width: 100%;
+  height: 350px;
+  margin-top: 20px;
+}
+
+.forecast-empty {
+  color: #9ca3af;
+  padding: 30px 0;
+}
+
+.forecast-table-wrapper {
+  overflow-x: auto;
+}
+
+.forecast-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.forecast-table th,
+.forecast-table td {
+  text-align: left;
+  padding: 15px 12px;
+  border-bottom: 1px solid #374151;
+}
+
+.forecast-table th {
+  background: #111827;
+  color: #d1d5db;
+}
+
+.forecast-table td {
+  color: #e5e7eb;
+}
+
+.forecast-table td.forecast-income {
+  color: #10b981;
+}
+
+.forecast-table td.forecast-expense {
+  color: #ef4444;
+}
+
+@media (max-width: 1100px) {
+  .forecasting-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .forecasting-page {
+    padding: 16px;
+  }
+
+  .forecasting-summary,
+  .forecast-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .forecast-summary-card,
+  .forecast-section {
+    padding: 18px;
+  }
+
+  .forecast-chart-container {
+    height: 280px;
+  }
+}

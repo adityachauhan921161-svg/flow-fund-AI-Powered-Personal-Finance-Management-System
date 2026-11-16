@@ -1,0 +1,177 @@
+
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background-color: #111827;
+  color: white;
+  padding: 24px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  margin-bottom: 35px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  color: #d1d5db;
+}
+
+.sidebar-item:hover {
+  background-color: #1f2937;
+  color: white;
+  cursor: pointer;
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .sidebar {
+    width: 80px;
+    padding: 20px 12px;
+  }
+
+  .sidebar-item span,
+  .sidebar-logo {
+    display: none;
+  }
+
+  .sidebar-item {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
+
+/* Mobile Sidebar Slide-in Menu */
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 1000;
+    overflow-y: auto;
+
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+}
+
+
+/* Sidebar Header */
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 35px;
+}
+
+/* Close Button - Hidden on Desktop */
+
+.sidebar-close-button {
+  display: none;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+/* Mobile Sidebar Close Button */
+
+@media (max-width: 768px) {
+  .sidebar-close-button {
+    display: block;
+  }
+}
+
+/* Final Sidebar Polish */
+
+/* Improve header alignment */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sidebar-header .sidebar-logo {
+  margin: 0;
+}
+
+/* Improve navigation interaction */
+.sidebar-item {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Improve close button */
+.sidebar-close-button {
+  line-height: 1;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-close-button:hover {
+  background-color: #374151;
+}
+
+/* Mobile sidebar refinements */
+@media (max-width: 768px) {
+  .sidebar {
+    width: min(250px, 85vw);
+    max-width: 100%;
+    box-sizing: border-box;
+    overscroll-behavior: contain;
+  }
+
+  .sidebar-header {
+    margin-bottom: 28px;
+  }
+
+  .sidebar-close-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+/* Sidebar navigation links */
+
+.sidebar-item {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Highlight active page */
+
+.sidebar-item.active {
+  background-color: #1f2937;
+  color: #ffffff;
+  font-weight: 600;
+}
