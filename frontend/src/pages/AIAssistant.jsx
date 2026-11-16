@@ -95,7 +95,7 @@ function AIAssistant() {
 
       // Send financial data to backend
       const response = await fetch(
-        "http://localhost:3000/api/ai/chat",
+        "/api/ai/chat",
         {
           method: "POST",
           headers: {

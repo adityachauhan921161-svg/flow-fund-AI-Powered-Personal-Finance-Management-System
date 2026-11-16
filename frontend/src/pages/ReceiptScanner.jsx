@@ -8,8 +8,6 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-const API_URL = "http://localhost:3000";
-
 const CATEGORIES = [
   "Food",
   "Transport",
@@ -144,7 +142,7 @@ function ReceiptScanner() {
       formData.append("receipt", receipt);
 
       const response = await fetch(
-        `${API_URL}/api/ai/scan-receipt`,
+        "/api/ai/scan-receipt",
         {
           method: "POST",
           body: formData,

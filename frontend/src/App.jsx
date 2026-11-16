@@ -26,7 +26,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/message")
+    fetch("/api/message")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Backend request failed");
