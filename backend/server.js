@@ -7,24 +7,42 @@ const multer = require("multer");
 const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Allow React frontend requests
+// =======================================
+// CORS CONFIGURATION
+// =======================================
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:4173",
+  ...(process.env.FRONTEND_URL
+    ? [process.env.FRONTEND_URL.replace(/\/$/, "")]
+    : []),
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS origin not allowed"));
+    },
   })
 );
 
-// Parse JSON request bodies
 app.use(express.json({ limit: "100kb" }));
 
-// Backend homepage
+// =======================================
+// BASIC ROUTES
+// =======================================
+
 app.get("/", (req, res) => {
   res.send("Welcome to FlowFund Backend!");
 });
 
-// Test API
 app.get("/api/message", (req, res) => {
   res.json({
     message: "Hello from FlowFund Backend!",
@@ -32,13 +50,15 @@ app.get("/api/message", (req, res) => {
   });
 });
 
-// Check Gemini API key
+// =======================================
+// GEMINI INITIALIZATION
+// =======================================
+
 if (!process.env.GEMINI_API_KEY) {
-  console.error("ERROR: GEMINI_API_KEY is missing from .env");
+  console.error("ERROR: GEMINI_API_KEY is missing");
   process.exit(1);
 }
 
-// Initialize Gemini
 const gemini = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
   httpOptions: {
@@ -46,9 +66,9 @@ const gemini = new GoogleGenAI({
   },
 });
 
-// ===============================
+// =======================================
 // FINANCIAL HELPER FUNCTIONS
-// ===============================
+// =======================================
 
 function normalizeCategory(category) {
   return typeof category === "string"
@@ -60,7 +80,6 @@ function roundMoney(value) {
   return Math.round((value + Number.EPSILON) * 100) / 100;
 }
 
-// Calculate financial summary
 function calculateFinancialSummary(financialData) {
   const transactions = Array.isArray(
     financialData?.transactions
@@ -70,6 +89,7 @@ function calculateFinancialSummary(financialData) {
 
   let totalIncome = 0;
   let totalExpenses = 0;
+
   const expensesByCategory = {};
 
   for (const transaction of transactions) {
@@ -111,7 +131,6 @@ function calculateFinancialSummary(financialData) {
   };
 }
 
-// Transaction dates are DD/MM/YYYY
 function isTransactionInMonth(dateString, month, year) {
   if (typeof dateString !== "string") {
     return false;
@@ -123,16 +142,12 @@ function isTransactionInMonth(dateString, month, year) {
     return false;
   }
 
-  const transactionMonth = Number(parts[1]);
-  const transactionYear = Number(parts[2]);
-
   return (
-    transactionMonth === month &&
-    transactionYear === year
+    Number(parts[1]) === month &&
+    Number(parts[2]) === year
   );
 }
 
-// Calculate monthly budgets
 function calculateBudgetSummary(financialData) {
   const budgets = Array.isArray(financialData?.budgets)
     ? financialData.budgets
@@ -230,7 +245,6 @@ function calculateBudgetSummary(financialData) {
   };
 }
 
-// Calculate savings goals
 function calculateSavingsSummary(financialData) {
   const goals = Array.isArray(financialData?.savingsGoals)
     ? financialData.savingsGoals
@@ -295,7 +309,6 @@ function calculateSavingsSummary(financialData) {
   };
 }
 
-// Personalized savings plans
 function calculateSavingsPlan(savingsSummary) {
   const today = new Date();
 
@@ -397,7 +410,6 @@ function calculateSavingsPlan(savingsSummary) {
   });
 }
 
-// Spending insights
 function calculateSpendingInsights(
   financialSummary,
   budgetSummary
@@ -453,17 +465,18 @@ function calculateSpendingInsights(
   };
 }
 
-// Financial health score
 function calculateFinancialHealthScore(
   financialSummary,
   budgetSummary,
   savingsSummary
 ) {
   const components = [];
+
   let earnedPoints = 0;
   let availablePoints = 0;
 
-  // Income vs expenses (40 points)
+  // Income vs expenses: 40 points
+
   if (
     financialSummary.transactionCount > 0 &&
     financialSummary.totalIncome > 0
@@ -496,7 +509,8 @@ function calculateFinancialHealthScore(
     });
   }
 
-  // Monthly budgets (30 points)
+  // Monthly budgets: 30 points
+
   if (budgetSummary.budgetCount > 0) {
     const budgetScores = budgetSummary.budgets.map(
       (budget) => {
@@ -543,7 +557,8 @@ function calculateFinancialHealthScore(
     });
   }
 
-  // Savings progress (30 points)
+  // Savings goals: 30 points
+
   if (savingsSummary.goalCount > 0) {
     const target = savingsSummary.totalTarget;
     const saved = savingsSummary.totalSaved;
@@ -601,9 +616,9 @@ function calculateFinancialHealthScore(
   };
 }
 
-// ===============================
+// =======================================
 // GEMINI AI FINANCIAL ASSISTANT
-// ===============================
+// =======================================
 
 app.post("/api/ai/chat", async (req, res) => {
   try {
@@ -804,7 +819,7 @@ or a creditworthiness assessment.
       },
     });
 
-    res.json({
+    return res.json({
       reply:
         response.text ||
         "Sorry, I could not generate a response.",
@@ -815,7 +830,7 @@ or a creditworthiness assessment.
       message: error.message,
     });
 
-    res.status(500).json({
+    return res.status(500).json({
       error:
         "Unable to generate an AI response. " +
         "Check the backend terminal for details.",
@@ -823,11 +838,10 @@ or a creditworthiness assessment.
   }
 });
 
-// ===============================
+// =======================================
 // GEMINI AI RECEIPT SCANNER
-// ===============================
+// =======================================
 
-// Accept receipt images up to 5 MB
 const receiptUpload = multer({
   storage: multer.memoryStorage(),
 
@@ -854,7 +868,6 @@ const receiptUpload = multer({
   },
 });
 
-// Scan receipt endpoint
 app.post("/api/ai/scan-receipt", (req, res) => {
   receiptUpload.single("receipt")(
     req,
@@ -948,6 +961,7 @@ belong to the Transport category.
         );
 
         // Validate amount
+
         const rawAmount = extracted.amount;
 
         const amount =
@@ -958,6 +972,7 @@ belong to the Transport category.
             : null;
 
         // Validate category
+
         const allowedCategories = [
           "Food",
           "Transport",
@@ -973,14 +988,13 @@ belong to the Transport category.
           allowedCategories.find(
             (item) =>
               item.toLowerCase() ===
-              String(
-                extracted.category || ""
-              )
+              String(extracted.category || "")
                 .trim()
                 .toLowerCase()
           ) || "Other";
 
         // Validate DD/MM/YYYY date
+
         let date = null;
 
         if (typeof extracted.date === "string") {
@@ -1011,17 +1025,17 @@ belong to the Transport category.
         }
 
         // Clean extracted strings
+
         const cleanString = (value) => {
           if (typeof value !== "string") {
             return null;
           }
 
-          return (
-            value.trim().slice(0, 160) || null
-          );
+          return value.trim().slice(0, 160) || null;
         };
 
         // Return details for user review
+
         return res.json({
           success: true,
 
@@ -1058,12 +1072,12 @@ belong to the Transport category.
   );
 });
 
-// ===============================
+// =======================================
 // START BACKEND SERVER
-// ===============================
+// =======================================
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(
-    `FlowFund Backend running at http://localhost:${PORT}`
+    `FlowFund Backend running on port ${PORT}`
   );
 });
